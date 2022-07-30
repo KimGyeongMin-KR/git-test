@@ -1,6 +1,6 @@
 team: Leopards
 
-manager: Nora
+manager: lupi
 coach : Melissa
 
 members:
@@ -10,4 +10,7 @@ members:
 - George
 - Olivia
 - Eive
+<<<<<<< HEAD
 - 왠안될까
+=======
+>>>>>>> 38d86e6cb805fb6c4f136d18994bd92c70206820
