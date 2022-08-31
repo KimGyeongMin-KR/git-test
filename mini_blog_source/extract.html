@@ -1,0 +1,123 @@
+
+<script>
+    function deleteCookie(){
+        $.removeCookie('mytoken');
+        window.location.reload('/');
+    }
+
+    function open_box() {
+        $('#admin').show()
+    }
+
+    function close_box() {
+        $('#admin').hide()
+    }
+
+    function getcookie() {
+        console.log('asdf')
+        $.ajax({
+            type: "POST",
+            url: "/admin",
+            data: {name: $('#name').val(), password: $('#password').val()},
+
+            success: function (response) {
+                if (response['result'] == 'success') {
+                    // 로그인이 정상적으로 되면, 토큰을 받아옵니다.
+                    // 이 토큰을 mytoken이라는 키 값으로 쿠키에 저장합니다.
+                    $.cookie('mytoken', response['token']);
+                    alert('로그인 완료!')
+                    window.location.href = '/'
+                } else {
+                    // 로그인이 안되면 에러메시지를 띄웁니다.
+                    alert(response['msg'])
+                    window.location.href = '/'
+                }
+            }
+        })
+    }
+    const herf = window.location.href.split('/')
+    const username = herf[herf.length - 1];
+    function delComment(num) {
+        console.log(num, username)
+        $.ajax({
+            type: 'DELETE',
+            url: `/${username}/comment`,
+            data: { num: num },
+            success: function (response) {
+                alert(response['result'])
+                // window.location.href = `/${username}`
+            }
+        })
+    }
+    function commentCreate() {
+        // let username = herf[herf.length - 1];
+        console.log(username)
+        $.ajax({
+            type: "POST",
+            url: `${username}/comment`,
+            data: { username: username, name: $('#name').val(), content: $('#content').val() },
+
+            success: function (response) {
+                if (response['result'] == 'success') {
+                    alert('저장 완료!')
+                    window.location.href = `/${username}`
+                } else {
+                    alert(response['msg'])
+                }
+            }
+        })
+    }
+</script>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+        <div class="container">
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="#team_name">팀 목표</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#team_object">팀 약속</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#team_promise">팀 소개</a></li>
+                    {% if name %}
+                    <li class="nav-item"><a class="nav-link" href="/create">팀원등록</a></li>
+                    <li class="nav-item nav-link" onclick="deleteCookie()">{{name}}</li>
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link" href="#admin" onclick="open_box()">Admin</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <p>ADMIN LOGIN</p>
+    <span class="input-group-text" id="addon-wrapping">ADMIN ID</span>
+    <input name="name" id="name" type="text" class="form-control" placeholder="Username"
+            aria-label="Username" aria-describedby="addon-wrapping">
+    <span class="input-group-text" id="addon-wrapping">PASSWORD</span>
+    <input name="password" id="password" type="password" class="form-control" placeholder="Username"
+            aria-label="Username" aria-describedby="addon-wrapping">
+    <input class="button" type="button" class="button" onclick="getcookie()">
+    <button class="button" onclick="close_box()" type="button">닫기</button>
+
+    <div id="comment-section">
+        {% for comment in data.commentList %}
+        {% if name %}
+        <div class="d-flex mb-2">
+            <div class="ms-3">
+                <div class="fw-bold">{{comment.name}} <input type="button" onclick="delComment(`{{comment.num}}`)"
+                        value="삭제하기"></div>
+                {{comment.content}}
+            </div>
+        </div>
+        {% else %}
+        <div class="d-flex mb-2">
+            <div class="ms-3">
+                <div class="fw-bold">{{comment.name}}</div>
+                {{comment.content}}
+            </div>
+        </div>
+        {% endif %}
+        {% endfor%}
+    </div>
+</body>
+
